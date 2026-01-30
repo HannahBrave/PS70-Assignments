@@ -1,8 +1,8 @@
 body {
     font: 20px "Roboto", Verdana, sans-serif;
     line-height: 1.8;
-    color: #000000;
-    background-color: #ED8A96;
+    color: #000301;
+    background-color: #ghostwhite;
     padding-top: 0px !important;
   }
 
@@ -14,7 +14,7 @@ p {font-size: 16px;}
 .margin {margin-bottom: 30px;}
 
 a {
-  color: #000000;
+  color: #000301;
 }
 
 .container-fluid {
@@ -23,7 +23,7 @@ a {
 }
 
 nav {
-  background-color: #E34A5C;
+  background-color: #000301;
   color: #EEE7E8;
   padding: 50px 0px;
 }
@@ -37,15 +37,15 @@ nav {
 .nav-title{
   margin-left: 15px;
   margin-right: 15px;
-  color: #65101A;
+  color: ##;
 }
 
 .nav-link {
-  border: 3px outset #ED8A96;
+  border: 3px outset #f7faf8;
   border-radius: 20px;
   padding: 10px 30px;
-  background-color: #B51C2E;
-  color: #EEE7E8;
+  background-color: #000301;
+  color: white;
   transition: 0.3s;
 }
 
