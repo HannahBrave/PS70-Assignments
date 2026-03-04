@@ -25,11 +25,33 @@
 
 <h3>Week 4: Microcontroller Programming</h3>
 
-<h4>[Do Something with an arduino]</h4>
-
-
-
-
+<h4>[I've never coded anything, so this week was very difficult for me!]</h4>
+<br></br>
+I began noting down the basics of arduino coding regarding motors to try to understand them.
+<br></br>
+<h4>What I understand so far in my own words:</h4>
+<br></br>
+In general: After every statement, put a ";" - it means "next."
+At the end & beginning of a statement put {}
+<br></br>
+Next, enter the void setup bracket, and the first thing you must do is organize your pins by declaring them! This makes it easier to change them later (you can just change them at the top instead of changing them at every point in your code). We use the function "int" - short for integer - to define these variables. 
+<br></br>
+<img src="./1.jpg" width = "300">
+<br></br>
+Next, you must declare all pins as output. To do this we use the "pinMode()" function, and inside the parenthesis label (pin,input/output). Since we want things to be happening at these pins and current to go there, we will label both as output.
+<br></br>
+<img src="./2.jpg" width = "300">
+<br></br>
+Next, I want to make sure both of the motors start off, so I will use a new function called "digitalWrite" 
+<br></br>
+This is a function used to control the elctricity flowing to a motor's pins. Parenthesis come after it, and inside them you put the pin, followed by a comma, and then HIGH or LOW.
+<br></br>
+EX. "digitalWrite(A1B,HIGH)."
+<br></br>
+HIGH means the full current is flowing to the motor, and LOW means no current is flowing. Motors spin when one pin is on HIGH and one pin is on LOW. 
+<br></br>
+*** If you switch which pin is HIGH and which pin is LOW, the motor will move in a different direction!
+<br></br>
 
 </div>
 </xmp>
