@@ -42,7 +42,7 @@ Next, you must declare all pins as output. To do this we use the "pinMode()" fun
 <br></br>
 <img src="./2.jpg" width = "300">
 <br></br>
-Next, I want to make sure both of the motors start off, so I will use a new function called "digitalWrite" 
+Next, I want to make sure both of the motors start off, so I will use a new function called "digitalWrite" and set both pins to LOW.
 <br></br>
 This is a function used to control the elctricity flowing to a motor's pins. Parenthesis come after it, and inside them you put the pin, followed by a comma, and then HIGH or LOW.
 <br></br>
@@ -51,6 +51,54 @@ EX. "digitalWrite(A1B,HIGH)."
 HIGH means the full current is flowing to the motor, and LOW means no current is flowing. Motors spin when one pin is on HIGH and one pin is on LOW. 
 <br></br>
 *** If you switch which pin is HIGH and which pin is LOW, the motor will move in a different direction!
+<br></br>
+Do this all in setup, then when you're ready to make the motor move, move inside the void loop function to make an action that repeats.
+<br></br>
+To spin the motor, use digitalWrite to write one pin low and one pin high.
+<br></br>
+Then you can use the delay function for the system to do nothing for a specified amount of time, essentially pausing the code as it is for that amount of time. 
+<br></br>
+If you set them low again, they will turn off. Again, to set them low for a specified period of time use the delay function to lock in that code.
+<br></br>
+These are the bare bones of which I created a system for being able to code my vibrating hexbug from last week!
+<br></br>
+<h4>
+  Issues I had with my bug from last week:
+</h4>
+<br></br>
+My bug was too heavy!!! The motor is not big enough to shake the whole insect reliably!
+<br></br>
+The extent of the electronics was a switch a motor and a battery, it could only be turned on & off.
+<br></br>
+<h4>
+  Things I changed:
+</h4>
+<br></br>
+I made cuts in the design to reduce weight, I made the top a ladybug design with holes, and the bottom has many holes for wiring. I also made vertical cuts in the sides, removed the entennas, and some of the weight from the legs.
+<br></br>
+<img src="./lady.jpg" width = "400">
+<img src="./lade.jpg" width = "400">
+<img src="./boday.jpeg" width = "400">
+<br></br>
+ I added a second motor to make a noise, like a cricket, that can be coded alongside the first motot which can now spin in two different directions and shake back and forth. I decided to attach a small breadboard to the robot so that I can code each of the motors and remove my microchip for other projects. 
+<br></br>
+This is the circuit I used for the project!
+<br></br>
+<img src="./IMG_7855.jpeg" width = "400">
+<img src="./mot.jpeg" width = "400">
+<img src="./circ.jpeg" width = "400">
+<br></br>
+Here is the code I ended up using!
+<br></br>
+<img src="./4.jpg" width = "400">
+<img src="./5.jpg" width = "400">
+<img src="./6.jpg" width = "400">
+<br></br>
+This is the movement that the bug has now! It happens in two parts. One to make it vibrate/move, and one to make a clicking noise like a cricket! (some cardstock attached to another motor)
+<br></br>
+ <iframe width="420" height="315"
+src="https://youtube.com/embed/nat33mU6cWM">
+</iframe>
 <br></br>
 
 </div>
