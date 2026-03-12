@@ -70,16 +70,64 @@ For this next assignment I wanted to use the teperature sensor, because I tried 
 <br></br>
 This is a photo of the circuit I used,
     <br></br>
-    <img src="./hey.jpg" width = "400">
+    <img src="./IMG_8122.jpg" width = "400">
     <br></br>
     And this is a diagram that I drew in my notebook in color for clarity,
     <br></br>
+    <img src="./IMG_8124.jpg" width = "400">
+    <br></br>
+    I wanted the led to turn red for hot when I am putting my fingers on the temperature sensor, blue for cold when I blow on it, and green when it is at room temperature, so, I used this code! Some is from the lab in which we used sensors.
+        <br></br>
+int ThermistorPin = A0;
+int Vo;
+float R1 = 10000;
+float R2, T;
+float A = 3.354e-03;
+float B = 2.5698e-4;
+
+void setup() {
+  // define pins as output for the led and for the thermistor
+  pinMode(10, OUTPUT);  // green
+  pinMode(9, OUTPUT);   // red
+  pinMode(8, OUTPUT);  // blue 
+  pinMode(ThermistorPin, INPUT); //thermistor read pin
+Serial.begin(9600);
+  
+}
+
+void loop() {
+  
+  Vo = analogRead(ThermistorPin);
+  R2 = R1 * 1/(4095.0 / (float)Vo - 1.0);  //Calculate resistance of thermistor from voltage divider math.
+  T = (1.0 / (A + B*log(R2/R1) ));  // Calculate temperature using datasheet formula.
+  T = T - 273.15;                   //Convert from Kelvin to Celcius.
+
+
+  Serial.print("Temperature: "); 
+  Serial.print(T);
+  Serial.println("C"); 
+
+ if (T>20){
+  digitalWrite(9, HIGH);   // turn on red channel
+  digitalWrite(8, LOW);
+  digitalWrite(10, LOW);
+ }
+else if (T<15){
+ digitalWrite(8, HIGH);  // turn on blue channel
+ digitalWrite(9, LOW);
+ digitalWrite(10, LOW);
+}
+else{
+digitalWrite(10, HIGH);  // turn on green channel
+digitalWrite(9, LOW);
+digitalWrite(8, LOW);
+}
+}
+        <br></br>
+        This is a graph that I created that details what is happening with the sensor reading. The guidelines are right, it is NOT linear.
+         <br></br>
     <img src="./hey.jpg" width = "400">
     <br></br>
-    I wanted the led to turn red for hot when I am putting my fingers on the temperature sensor, blue for cold when I blow on it, and green when it is at room temperature, so, I used this code!
-        <br></br>
-        <img src="./hey.jpg" width = "400">
-        <br></br>
 <h4>Assignment 3: [CAD files for next week]</h4>
 <br></br>
 I was super excited about this! I had the idea to make a tensegrity (floating) chair out of plywood so I did research on what designs are out there, then made two original dsigns of my own!
