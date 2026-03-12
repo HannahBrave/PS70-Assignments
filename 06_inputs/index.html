@@ -78,51 +78,89 @@ This is a photo of the circuit I used,
     <br></br>
     I wanted the led to turn red for hot when I am putting my fingers on the temperature sensor, blue for cold when I blow on it, and green when it is at room temperature, so, I used this code! Some is from the lab in which we used sensors.
         <br></br>
-int ThermistorPin = A0;
+<code>
+        <br></br>
+        int ThermistorPin = A0;
+        <br></br>
 int Vo;
+      <br></br>
 float R1 = 10000;
+      <br></br>
 float R2, T;
+      <br></br>
 float A = 3.354e-03;
+      <br></br>
 float B = 2.5698e-4;
-
+     
+      <br></br>      <br></br>
 void setup() {
+        <br></br>
   // define pins as output for the led and for the thermistor
+        <br></br>
   pinMode(10, OUTPUT);  // green
+        <br></br>
   pinMode(9, OUTPUT);   // red
+        <br></br>
   pinMode(8, OUTPUT);  // blue 
+        <br></br>
   pinMode(ThermistorPin, INPUT); //thermistor read pin
+        <br></br>
 Serial.begin(9600);
-  
+        <br></br>      <br></br>
 }
-
+      <br></br>      <br></br>
 void loop() {
-  
+        <br></br>      <br></br>
   Vo = analogRead(ThermistorPin);
+        <br></br>
   R2 = R1 * 1/(4095.0 / (float)Vo - 1.0);  //Calculate resistance of thermistor from voltage divider math.
+        <br></br>
   T = (1.0 / (A + B*log(R2/R1) ));  // Calculate temperature using datasheet formula.
+        <br></br>
   T = T - 273.15;                   //Convert from Kelvin to Celcius.
 
-
+      <br></br>
+            <br></br>
   Serial.print("Temperature: "); 
+        <br></br>
   Serial.print(T);
+        <br></br>
   Serial.println("C"); 
-
+      <br></br>
+            <br></br>
  if (T>20){
+        <br></br>
   digitalWrite(9, HIGH);   // turn on red channel
+        <br></br>
   digitalWrite(8, LOW);
+        <br></br>
   digitalWrite(10, LOW);
+        <br></br>
  }
+       <br></br>
 else if (T<15){
+        <br></br>
  digitalWrite(8, HIGH);  // turn on blue channel
+       <br></br>
  digitalWrite(9, LOW);
+       <br></br>
  digitalWrite(10, LOW);
+       <br></br>
 }
+      <br></br>
 else{
+        <br></br>
 digitalWrite(10, HIGH);  // turn on green channel
+      <br></br>
 digitalWrite(9, LOW);
+      <br></br>
 digitalWrite(8, LOW);
+      <br></br>
 }
+      <br></br>
 }
+      <br></br>
+</code>
         <br></br>
         This is a graph that I created that details what is happening with the sensor reading. The guidelines are right, it is NOT linear.
          <br></br>
