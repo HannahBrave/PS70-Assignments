@@ -143,6 +143,10 @@ IMAGE IMAGE IMAGE IMAGE
 This is the piece that connects the string to pull the claw open, resisting the rubber band.
 <br></br>
 
+<br></br>
+<a download href='./tensegrity1 copy.dxf'> Download the DXF of the claw mechanism</a>
+  <br></br>
+
 <h3>4. The electronics</h3>
 <br></br>
 This part was not too difficult, and I did it last because during the time I was cponstructing the physcial components I was brainstorming how this mechanism would work and what type of motor I'd use to move the claw. 
@@ -151,32 +155,36 @@ I decided on a simple mechanism with a *SERVO* motor, because as I learned durin
 <br></br>
 Props to servo motors for being easy to set to stagnant degrees!
 <br></br>
-For now, I decided on a simple mechanism for this with a very simple code:
+<h2> For now, I decided on a simple mechanism for this with a very simple code: </h2>
 <br></br>
-#include <ESP32Servo.h>
-  <br></br>
-Servo servo1;
-<br></br>
-Servo servo2;
-<br></br>
-void setup() {
-  <br></br>
-  // put your setup code here, to run once:
-  <br></br>
-servo1.attach (D1);
-<br></br>
-}
-<br></br>
-<br></br>
-void loop() {
-  <br></br>
-  // put your main code here, to run repeatedly:
-  <br></br>
-servo1.write(180);
-<br></br>
-}
+(YAY I figured out how to include code in html)
 <br></br>
 
+<pre>
+    <code>
+#include <ESP32Servo.h>
+Servo servo1;
+Servo servo2;
+void setup() {
+  // put your setup code here, to run once:
+servo1.attach (D1);
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+servo1.write(180);
+}
+    </code>
+</pre>
+<br></br>
+And here is a diagram of the simple circuit!
+<br></br>
+IMAGE IMAGE IMAGE IMAGE
+<br></br>
+This code will open/close the claw based on what degree I put in the paranthesis.
+
+<br></br>
+I will soon switch this code & mechanism to be a bit more advanced for the in-person presentation of our MVP next week, ideally using a button/swtich to control the opening/closing of the claw, as well as it being freestanding from my computer and controlled with a battery pack in my pocket. (Should take me 1-3 hours on Monday night/Tuesday morning)
 <br></br>
 
 
