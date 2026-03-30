@@ -147,9 +147,35 @@ This is the piece that connects the string to pull the claw open, resisting the 
 <br></br>
 This part was not too difficult, and I did it last because during the time I was cponstructing the physcial components I was brainstorming how this mechanism would work and what type of motor I'd use to move the claw. 
 <br></br>
-I decided on a simple mechanism with a SERVO motor, because as I learned during the useless box lab, it is very easy to control the angles at which the motor goes to, which is very useful in 
-
-
+I decided on a simple mechanism with a *SERVO* motor, because as I learned during the useless box lab, it is very easy to control the angles at which the motor goes to, which is useful in the movement of bringing it one direction to pull the string and open the claw, and then send it the opposite way to release the tension and close the claw again. 
+<br></br>
+Props to servo motors for being easy to set to stagnant degrees!
+<br></br>
+For now, I decided on a simple mechanism for this with a very simple code:
+<br></br>
+#include <ESP32Servo.h>
+  <br></br>
+Servo servo1;
+<br></br>
+Servo servo2;
+<br></br>
+void setup() {
+  <br></br>
+  // put your setup code here, to run once:
+  <br></br>
+servo1.attach (D1);
+<br></br>
+}
+<br></br>
+<br></br>
+void loop() {
+  <br></br>
+  // put your main code here, to run repeatedly:
+  <br></br>
+servo1.write(180);
+<br></br>
+}
+<br></br>
 
 <br></br>
 
