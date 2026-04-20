@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Heart Rate Game</title>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.min.js"></script>
+</head>
+<body style="margin:0; overflow:hidden; background:#0b0e1a; color:white;">
+
+<button onclick="connectBLE()" style="position:fixed; top:10px; left:10px; font-size:16px; padding:8px 14px; border-radius:999px; border:none; background:#ff4f7b; color:white; box-shadow:0 0 10px rgba(255,79,123,0.6); cursor:pointer; z-index:10;">
+  Connect
+</button>
+
+<script>
+let bpm = 70;
+let characteristic;
+
+// GAME / QUIZ STATE 
+let gameState = "question"; // question, exercise, result, done
+let selectedResponse = null;
+let countdown = 10;
+let exercise = "";
+let resultMessage = "";
+let isCorrect = false;
+
+// QUESTIONS
+let questions = [
+  {
+    text: "What organ pumps blood through your body?",
+    options: ["Heart", "Lungs"],
+    correct: 1
+  },
+  {
+    text: "What shape has three sides?",
+    options: ["Triangle", "Circle"],
+    correct: 1
+  },
+  {
+    text: "What color is the sky on a clear day?",
+    options: ["Blue", "Red"],
+    correct: 1
+  },
+  {
+    text: "What number comes after 4?",
+    options: ["5", "3"],
+    correct: 1
+  },
+  {
+    text: "What do you need to breathe?",
+    options: ["Oxygen", "Milk"],
+    correct: 1
+  }
+];
+
+let currentQuestionIndex = 0;
+let score = 0;
+
+// EXERCISES
+let exercises = [
+  "5 Jumping Jacks ",
+  "10 Fast Steps in Place",
+  "5 High Knees Each Leg",
+  "10 Arm Circles Forward",
+  "5 Squats"
+];
+
+let exerciseIndex = 0;
+
+// BLE CONNECTION 
+async function connectBLE() {
+  const device = await navigator.bluetooth.requestDevice({
+    filters: [{ name: "ESP32" }],
+    optionalServices: ["12345678-1234-1234-1234-123456789abc"]
+  });
+
+  const server = await device.gatt.connect();
+  const service = await server.getPrimaryService("12345678-1234-1234-1234-123456789abc");
+  characteristic = await service.getCharacteristic("abcdefab-1234-1234-1234-abcdefabcdef");
+
+  await characteristic.startNotifications();
+
+  characteristic.addEventListener('characteristicvaluechanged', (event) => {
+    console.log("received message")
+    let value = new TextDecoder().decode(event.target.value);
+    let val = parseInt(value);
+    console.log(val)
+    if (!isNaN(val)) bpm = val;
+  });
+
+  console.log("Connected ❤️");
+}
+
+// P5 SETUP 
+function setup() {
+  createCanvas(window.innerWidth, window.innerHeight);
+  textAlign(CENTER, CENTER);
+  textFont('sans-serif');
+  textSize(24);
+
+  // shuffle exercises once at start
+  exercises = shuffle(exercises, true);
+}
+
+// DRAW LOOP
+function draw() {
+  drawBackground();
+  drawHeartFrame();
+  drawCentralHeart();
+  drawHUD();
+
+  // State‑specific text/UI so nothing lingers between states
+  if (gameState === "question") {
+    drawQuestionUI();
+  } else if (gameState === "exercise") {
+    drawExerciseUI();
+  } else if (gameState === "result") {
+    drawResultUI();
+  } else if (gameState === "done") {
+    drawFinalUI();
+  }
+}
+
+// -------- UI SECTIONS --------
+
+function drawQuestionUI() {
+  fill(255);
+  textSize(28);
+  text("Question " + (currentQuestionIndex + 1) + " of " + questions.length, width/2, height*0.18);
+
+  textSize(24);
+  text(questions[currentQuestionIndex].text, width/2, height*0.28);
+
+  let q = questions[currentQuestionIndex];
+  drawButton(q.options[0], width/2 - 180, height*0.45, () => selectResponse(1));
+  drawButton(q.options[1], width/2 + 180, height*0.45, () => selectResponse(2));
+}
+
+function drawExerciseUI() {
+  fill(255);
+  textSize(28);
+  text("HEART CHALLENGE", width/2, height*0.18);
+
+  textSize(22);
+  if (selectedResponse === 1) {
+    text(exercise, width/2, height*0.28);
+  } else {
+    text("Stay completely still 🧘", width/2, height*0.28);
+  }
+
+  textSize(20);
+  text("Time left: " + countdown + "s", width/2, height*0.35);
+
+  // visual timer ring
+  let pct = countdown / 10;
+  noFill();
+  stroke(255, 80);
+  strokeWeight(14);
+  ellipse(width/2, height*0.55, 160, 160);
+  stroke(255, 90, 130);
+  arc(width/2, height*0.55, 160, 160, -HALF_PI, -HALF_PI + TWO_PI * pct);
+
+  // countdown logic
+  if (frameCount % 60 === 0 && countdown > 0) {
+    countdown--;
+  }
+  if (countdown === 0) {
+    evaluateResult();
+  }
+}
+
+function drawResultUI() {
+  fill(255);
+  textSize(30);
+  text(resultMessage, width/2, height*0.32);
+
+  textSize(22);
+  text("BPM: " + bpm, width/2, height*0.38);
+  text("Score: " + score + " / " + questions.length, width/2, height*0.44);
+
+  let btnLabel = (currentQuestionIndex < questions.length - 1) ? "Next Question" : "See Final Score";
+  drawButton(btnLabel, width/2, height*0.58, nextStep);
+}
+
+function drawFinalUI() {
+  fill(255);
+  textSize(34);
+  text("You reached the end of the heart quiz!", width/2, height*0.3);
+
+  textSize(26);
+  text("Final Score: " + score + " / " + questions.length, width/2, height*0.36);
+
+  textSize(18);
+  text("Tip: Watch how your heart responds as you move and rest.", width/2, height*0.42);
+
+  drawButton("Play Again", width/2, height*0.56, resetGame);
+}
+
+// -------- BUTTON --------
+function drawButton(label, x, y, action) {
+  let w = 220;
+  let h = 60;
+
+  let isHover = mouseX > x - w/2 && mouseX < x + w/2 &&
+                mouseY > y - h/2 && mouseY < y + h/2;
+
+  noStroke();
+  fill(isHover ? color(255, 79, 123) : color(255, 255, 255, 220));
+  rectMode(CENTER);
+  rect(x, y, w, h, 16);
+
+  fill(isHover ? 255 : 40);
+  textSize(20);
+  text(label, x, y+2);
+
+  if (mouseIsPressed && isHover) {
+    action();
+  }
+}
+
+// -------- GAME LOGIC --------
+
+function selectResponse(choice) {
+  if (gameState !== "question") return;
+
+  selectedResponse = choice;
+
+  // pick exercise in sequence, reshuffle when we hit the end
+  if (exerciseIndex >= exercises.length) {
+    exercises = shuffle(exercises, true);
+    exerciseIndex = 0;
+  }
+  exercise = exercises[exerciseIndex];
+  exerciseIndex++;
+
+  countdown = 10;
+  gameState = "exercise";
+}
+
+function evaluateResult() {
+  let q = questions[currentQuestionIndex];
+  isCorrect = (selectedResponse === q.correct);
+
+  if (selectedResponse === 1) {
+    if (bpm > 100) {
+      resultMessage = isCorrect
+        ? "Correct AND your heart worked hard! ❤️🔥"
+        : "Your heart worked, but the answer was wrong.";
+    } else {
+      resultMessage = isCorrect
+        ? "Correct, but try to move a bit more next time."
+        : "Wrong answer and low heart push. Try again next round!";
+    }
+  } else {
+    if (bpm < 100) {
+      resultMessage = isCorrect
+        ? "Correct AND you stayed calm. Zen heart! 🧘‍♀️"
+        : "You stayed calm, but the answer was wrong.";
+    } else {
+      resultMessage = isCorrect
+        ? "Correct answer, but your heart is still excited!"
+        : "Wrong answer and your heart sped up. Interesting!";
+    }
+  }
+
+  if (isCorrect) score++;
+
+  gameState = "result";
+}
+
+function nextStep() {
+  if (gameState !== "result") return;
+
+  if (currentQuestionIndex < questions.length - 1) {
+    currentQuestionIndex++;
+    selectedResponse = null;
+    countdown = 10;
+    gameState = "question";
+  } else {
+    gameState = "done";
+  }
+}
+
+function resetGame() {
+  gameState = "question";
+  selectedResponse = null;
+  countdown = 10;
+  exercise = "";
+  resultMessage = "";
+  score = 0;
+  currentQuestionIndex = 0;
+  exerciseIndex = 0;
+  exercises = shuffle(exercises, true);
+}
+
+// -------- VISUALS --------
+
+// cool geometric, heart‑motif background
+function drawBackground() {
+  // gradient background
+  for (let y = 0; y < height; y += 4) {
+    let t = y / height;
+    let c = lerpColor(color(6, 9, 30), color(36, 5, 40), t);
+    stroke(c);
+    line(0, y, width, y);
+  }
+
+  noFill();
+  stroke(255, 40);
+  strokeWeight(1);
+
+  // geometric grid
+  let step = 80;
+  for (let x = 0; x < width; x += step) {
+    line(x, 0, x, height);
+  }
+  for (let y = 0; y < height; y += step) {
+    line(0, y, width, y);
+  }
+
+  // floating hearts
+  noStroke();
+  for (let i = 0; i < 12; i++) {
+    let hx = (i * 90 + frameCount * 0.5) % (width + 180) - 90;
+    let hy = (sin((i * 30 + frameCount) * 0.02) * 80) + height * 0.2;
+    let s = 18 + (i % 3) * 6;
+    drawHeartShape(hx, hy, s, color(255, 79, 123, 120));
+  }
+
+  // heart rate line along bottom
+  stroke(255, 80);
+  strokeWeight(2);
+  noFill();
+  beginShape();
+  let baseline = height - 80;
+  for (let x = 0; x <= width; x += 10) {
+    let t = (x + frameCount * 2) * 0.02;
+    let y = baseline - (abs(sin(t * 3)) * 20);
+    vertex(x, y);
+  }
+  endShape();
+}
+
+// heart frame behind central heart
+function drawHeartFrame() {
+  let cx = width/2;
+  let cy = height/2;
+  let s = 260;
+
+  push();
+  translate(cx, cy);
+  noFill();
+  stroke(255, 80);
+  strokeWeight(3);
+  polygon(0, 0, s*0.55, 6);
+
+  noStroke();
+  drawHeartShape(0, 0, s*0.6, color(255, 79, 123, 60));
+  pop();
+}
+
+// central heart avatar
+function drawCentralHeart() {
+  push();
+  translate(width/2, height/2 - 10);
+  drawHeartShape(0, 0, 140, color(255, 79, 123));
+
+  // inner glow
+  drawHeartShape(0, 0, 110, color(255, 180, 200, 180));
+  pop();
+}
+
+// Proper heart shape using two circles + triangle
+function drawHeartShape(x, y, size, col) {
+  push();
+  translate(x, y);
+  noStroke();
+  fill(col);
+
+  let r = size / 2;
+  // top two circles
+  ellipse(-r*0.5, -r*0.3, r, r);
+  ellipse(r*0.5, -r*0.3, r, r);
+
+  // bottom triangle
+  beginShape();
+  vertex(-r, -r*0.1);
+  vertex(0, r);
+  vertex(r, -r*0.1);
+  endShape(CLOSE);
+
+  pop();
+}
+
+// regular polygon helper
+function polygon(x, y, radius, npoints) {
+  let angle = TWO_PI / npoints;
+  beginShape();
+  for (let a = 0; a < TWO_PI; a += angle) {
+    let sx = x + cos(a) * radius;
+    let sy = y + sin(a) * radius;
+    vertex(sx, sy);
+  }
+  endShape(CLOSE);
+}
+
+// HUD: BPM and label
+function drawHUD() {
+  // BPM pill
+  let pillX = width - 140;
+  let pillY = 40;
+  let pillW = 180;
+  let pillH = 36;
+  rectMode(CENTER);
+  noStroke();
+  fill(0, 0, 0, 140);
+  rect(pillX, pillY, pillW, pillH, 999);
+
+  drawHeartShape(pillX - pillW/2 + 26, pillY, 18, color(255, 79, 123));
+
+  fill(255);
+  textSize(16);
+  textAlign(LEFT, CENTER);
+  text("BPM: " + bpm, pillX - pillW/2 + 44, pillY);
+
+  // title (always visible, non‑overlapping)
+  textAlign(CENTER, CENTER);
+  textSize(22);
+  fill(255, 220);
+  text("Heart Rate Game", width/2, 40);
+}
+
+function windowResized() {
+  resizeCanvas(window.innerWidth, window.innerHeight);
+}
+</script>
+
+</body>
+</html>
