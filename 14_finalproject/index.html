@@ -37,7 +37,9 @@ Here is a full design review and demonstration:
 src="https://youtube.com/embed/WUug37tjBpM">
 </iframe>
 <br></br>
-Here is every single fusion file that I've used to print these so you can make it yourself! They're in f3d format so you can edit them directly in fusion. If you come across any issues feel free to email me at the email in my about page!
+Below is every single fusion file that I've used to print these so you can make it yourself! They're in f3d format so you can edit them directly in fusion. If you come across any issues feel free to email me at the email in my about page!
+<br></br>
+All of the pieces snap together in a simple way without glue so that everything can be replaced if the PLA breaks. The servo motor slips into the claw and screws into a hole in the side of the lower jaw.
 <br></br>
 <a download href='./clawfinal.f3d'> Download the f3d file of the top & bottom of the claw </a>
 <br></br>
@@ -47,21 +49,156 @@ Here is every single fusion file that I've used to print these so you can make i
 <br></br>
 <a download href='./lightbox.f3d'> Download the f3d file of the light box</a>
 <br></br>
+I first created the code for the claw opening/closing mechanism,
+<br></br>
+<pre style = "height: 200px; overflow: auto; border: 1px solid black;">
+    <code>
+#include < ESP32Servo.h>
+Servo servo1;
+const int button1 = D2;  // D2
+
+
+void setup() {
+  
+servo1.attach (D1);
+pinMode(button1, INPUT_PULLUP);
+}
+
+void loop()
+ 
+{
+  if (digitalRead(button1) == LOW) {
+    servo1.write(80);
+    delay(200);
+  }
+
+  if (digitalRead(button1) == HIGH) {
+    servo1.write(150);
+    delay(200);
+  }
+    }
+    </code>
+  </pre>
+<br></br>
+ Then a separate file for the nightlight. (I used variable names to explain what I'm doing!)
+
+ <br></br>
+<pre style = "height: 200px; overflow: auto; border: 1px solid black;">
+    <code>
+
+const int ledPin = D7;
+const int ldrPin = A0;
+
+long lastTimeWeGotMeasurement =  0;
+long measurementInterval = 1000;
+
+void setup() {
+
+  Serial.begin(9600);
+  pinMode (ledPin, OUTPUT);
+  pinMode (ldrPin, INPUT);
+}
+
+
+void loop() {
+  long currentTime = millis();
+
+  if (currentTime - lastTimeWeGotMeasurement >= measurementInterval)
+  { 
+    int ldrStatus = analogRead(ldrPin);
+    if (ldrStatus <=4000) {
+      digitalWrite (ledPin, HIGH);
+      Serial.println ("ON");
+      Serial.println (ldrStatus);
+    }
+
+    else {
+      digitalWrite (ledPin, LOW);
+      Serial.println ("OFF");
+      Serial.println (ldrStatus);
+    }
+    
+
+    lastTimeWeGotMeasurement = currentTime;
+    }
+}
+    </code>
+  </pre>
+<br></br>
+     They're condensed into one code below!
+<br></br>
+<pre style = "height: 200px; overflow: auto; border: 1px solid black;">
+    <code>
+      #include < ESP32Servo.h>
+Servo servo1;
+const int button1 = D2;  // D2
+
+
+const int ledPin = D7;
+const int ldrPin = A0;
+
+long lastTimeWeGotMeasurement =  0;
+long measurementInterval = 1000;
+
+void setup() {
+servo1.attach (D1);
+pinMode(button1, INPUT_PULLUP);
+
+  Serial.begin(9600);
+  pinMode (ledPin, OUTPUT);
+  pinMode (ldrPin, INPUT);
+}
+
+
+void loop() {
+  long currentTime = millis();
+
+  if (currentTime - lastTimeWeGotMeasurement >= measurementInterval)
+  { 
+    int ldrStatus = analogRead(ldrPin);
+    if (ldrStatus <=4000) {
+      digitalWrite (ledPin, HIGH);
+      Serial.println ("ON");
+      Serial.println (ldrStatus);
+    }
+
+    else {
+      digitalWrite (ledPin, LOW);
+      Serial.println ("OFF");
+      Serial.println (ldrStatus);
+    }
+    //set lastTimeWeGotMeasurement to currentTime
+
+    lastTimeWeGotMeasurement = currentTime;
+    }
+    if (digitalRead(button1) == LOW) {
+      servo1.write(80);
+    }
+
+    if (digitalRead(button1) == HIGH) {
+        servo1.write(150);
+      }
+
+}
+    </code>
+  </pre>
+<br></br>
 <h3>A basic overview of what has changed since my final project integration documentation:
 <br></br>
 1. Multimedia Printing with PLA and TPU to Make the Claw Flexible
 <br></br>
 2. A Functioning Nightlight for Grabbing in the Dark - Code Checks Light Level Constantly W/ Millis() function
 <br></br>
-3. Magnetic Attachment to the Arm Sleeve - W/ Support Spokes
+3. Magnetic Attachment to the Arm Sleeve - W/ Support Spokes for Strength
 <br></br>
 4. Pressure on the Wrist Movement creates the Opening and Closing Effect
 <br></br>
 5. Two Claw Fixtures, Both Run Off of One Power Bank</h3>
+<br></br>
 
-<br></br><br></br>
+<br></br>
 
-More documentation and process coming soon!
+
 
 
 
